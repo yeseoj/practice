@@ -1,10 +1,11 @@
-/** 객체지향프로그래밍 HW#4
-*	파일명: sungjuk4.cpp
-*	학과: 소프트웨어학과
-*	학번: 2021041018
-*	이름: 장예서
-*	수정일: 2022-04-13
-*/
+/** 객체지향프로그래밍 HW#5
+ *	파일명: sungjuk3.cpp
+ *	학과: 소프트웨어학과
+ *	학번: 2021041018
+ *	이름: 장예서
+ *	안내사항: ModifyStdInfo() 함수에서 StdSearch() 함수를 호출하기 위해 임의로 StdNum 인자를 추가하였습니다.
+ *	수정일: 2022-04-20
+ */
 
 #include<iostream>
 #include<cstring>
@@ -21,21 +22,22 @@ struct Student {		// 학생 정보
 	char StdName[30];	// 학생이름
 	int Hakbun;			// 학번
 	Subject* Sub;		// 과목
-	int SubNum;
+	int SubNum;			// 과목 수
 	float AveGPA;		// 교과목 평균 평점
 };
 
 inline void PrintMenu();											// 메뉴 출력
+inline void InputValue(char *str);									// char형 데이터 입력받는 함수
+inline void InputValue(int &i);										// int형 데이터 입력받는 함수
 void InputData(Student* pSt, int StdNum);							// 학생 신상 및 성적 정보 입력
-inline void InputValue(char* str);									// char형 데이터 입력받는 함수
-inline void InputValue(int& i);										// int형 데이터 입력받는 함수
 void CalcGPA(Subject& Sub);											// 교과목 평점 계산
 float CalcAveGPA(Subject* Sub, int SubNum);							// 개인 학생의 평균 평점 계산
 void PrintAllStdList(Student* pSt, int StdNum);						// 전체 학생 목록 출력
 void PrintAllData(const Student* pSt, int StdNum);					// 전체 학생 신상/성적 정보 출력
 void PrintOneData(const Student& rSt);								// 개인 학생 신상/성적 정보 출력
 Student* StdSearch(Student* pSt, int StdNum); 						// 학생 이름 검색 후 해당 학생 정보 있는 곳 주소 리턴
-void ModifyStdInfo(Student* pSt);									// 학생 정보 수정하는 함수
+void ModifyStdInfo(Student* pSt, int StdNum);						// 학생 정보 수정하는 함수
+
 
 
 int main() {
@@ -54,8 +56,8 @@ int main() {
 		switch (menunum) {
 		case 1:	/* 학생 성적 입력 및 성적 계산 */
 			check = 1;												// 1 실행시 변수 값 변경
-			cout << "정보를 입력받을 학생 수를 입력: ";				    // 학생 수 입력
-			InputValue(StdNum);
+			cout << "정보를 입력받을 학생 수를 입력: ";
+			InputValue(StdNum);										// 학생 수 입력
 			cout << "\n";
 			Stu = new Student[StdNum];								// 학생 수만큼 동적 구조체 할당
 			InputData(Stu, StdNum);									// 신상 및 성적 정보 입력
@@ -68,8 +70,7 @@ int main() {
 			break;
 		case 3: /* 학생 이름 검색 */
 			if (check == 1) {										// 1 먼저 실행했는지 체크
-				Student* SearchStd;
-				SearchStd = StdSearch(Stu, StdNum);					// 학생 이름 입력(없을 시 SearchStd = NULL)
+				Student* SearchStd = StdSearch(Stu, StdNum);		// 학생 이름 입력(없을 시 SearchStd = NULL)
 				if (SearchStd != NULL)								// SearchStd에 학생 이름이 제대로 입력됐다면
 					PrintOneData(*SearchStd);						// 개인 학생의 성적 출력
 			}
@@ -83,11 +84,8 @@ int main() {
 				cout << "1번부터 실행해 주세요.\n\n";
 			break;
 		case 5: /* 학생 정보 수정 */
-			if (check == 1) {			   							// 1 먼저 실행했는지 체크
-				Student* temp = StdSearch(Stu, StdNum);				// 학생 이름을 검색한 결과 해당 학생이 존재한다면
-				if (temp != NULL)
-					ModifyStdInfo(temp);							// 학생 정보 수정하는 함수 호출
-			}
+			if (check == 1)	   										// 1 먼저 실행했는지 체크
+				ModifyStdInfo(Stu, StdNum);							// 학생 정보 수정 함수 호출
 			else
 				cout << "1번부터 실행해 주세요.\n\n";
 			break;
@@ -108,9 +106,8 @@ int main() {
 
 }
 
-
+/* 메뉴 출력 */
 void PrintMenu() {
-	/* 메뉴 출력 */
 	cout << "===== 메뉴 =====\n"
 		"1. 학생 성적 입력\n"
 		"2. 전체 학생 성적 보기\n"
@@ -121,9 +118,18 @@ void PrintMenu() {
 		"원하는 기능을 입력하세요 : ";
 }
 
+/* 문자열 값 입력 */
+void InputValue(char* str) {
+	cin >> str;
+}
 
+/* 정수 값 입력 */
+void InputValue(int& i) {
+	cin >> i;
+}
+
+/* 전체 학생 정보 입력 */
 void InputData(Student* pSt, int StdNum) {
-	/* 전체 학생 정보 입력 */
 	for (int i = 0; i < StdNum; i++) {
 		cout << "* " << i + 1 << "번째 학생 이름과 학번을 입력하세요.\n";
 		cout << "이름 : ";
@@ -150,16 +156,8 @@ void InputData(Student* pSt, int StdNum) {
 	}
 }
 
-void InputValue(char* str) {
-	cin >> str;
-}
-
-void InputValue(int& i) {
-	cin >> i;
-}
-
+/* 교과목별 평점 계산 */
 void CalcGPA(Subject& Sub) {
-	/* 교과목별 평점 계산 */
 	switch (Sub.Grade[0]) {											// 문자열의 첫 번째 문자 기준으로 기본점수 부여
 	case 'A':
 		Sub.GPA = 4.0; break;
@@ -178,8 +176,8 @@ void CalcGPA(Subject& Sub) {
 	Sub.GPA *= Sub.Hakjum; 											// 교과목별 평점 최종 계산(=등급별 점수 * 학점)
 }
 
+/* 교과목 평균 평점 계산 */
 float CalcAveGPA(Subject* Sub, int SubNum) {
-	/* 교과목 평균 평점 계산 */
 	float GPAtot = 0;												// 평점의 합을 저장하는 변수
 	for (int i = 0; i < SubNum; i++) {								// for문을 통해 각 교과목 평점의 합 계산
 		GPAtot += Sub[i].GPA;
@@ -187,8 +185,8 @@ float CalcAveGPA(Subject* Sub, int SubNum) {
 	return GPAtot / (float)SubNum;									// 평균 평점 계산 (=각 교과목 평점의 합 / 총 과목수)
 }
 
+/* 전체 학생 목록 출력 */
 void PrintAllStdList(Student* pSt, int StdNum) {
-	/* 전체 학생 목록 출력 */
 	cout << "=================================\n";
 	cout.width(10);
 	cout << "학번";
@@ -204,8 +202,8 @@ void PrintAllStdList(Student* pSt, int StdNum) {
 	cout << "=================================\n\n\n";
 }
 
+/* 전체 학생 정보 출력 */
 void PrintAllData(const Student* pSt, int StdNum) {
-	/* 전체 학생 정보 출력 */
 	cout.width(35);
 	cout << "전체 학생 성적 보기\n";
 	cout << "=================================================\n";
@@ -213,8 +211,8 @@ void PrintAllData(const Student* pSt, int StdNum) {
 		PrintOneData(pSt[i]);										// 개인 학생 정보 출력 함수를 호출
 }
 
+/* 개인 학생 정보 출력 */
 void PrintOneData(const Student& rSt) {
-	/* 개인 학생 정보 출력 */
 	cout << "이름 : " << rSt.StdName << "	학번 : " << rSt.Hakbun;
 	cout << "\n=================================================\n";
 	cout.width(15);	cout << "과목명";
@@ -234,8 +232,8 @@ void PrintOneData(const Student& rSt) {
 	cout.width(8); cout.precision(2); cout << fixed; cout << rSt.AveGPA << "\n\n\n";
 }
 
+/* 특정 학생 정보 검색 */
 Student* StdSearch(Student* pSt, int StdNum) {
-	/* 특정 학생 정보 검색 */
 	cout << "검색할 학생 이름: ";
 	char SearchName[30];
 	cin >> SearchName;
@@ -244,16 +242,19 @@ Student* StdSearch(Student* pSt, int StdNum) {
 		if (!strcmp(SearchName, pSt[i].StdName))					// 검색한 이름과 저장된 이름 문자열 비교(같으면 0)
 			return &pSt[i];											// 찾으면 해당 학생 정보가 저장된 곳 시작 주소 리턴
 	}
-	cout << "검색한 학생의 데이터가 존재하지 않습니다.\n\n\n";				// 끝까지 돌아도 없으면 해당 메시지 출력 후 NULL 리턴
+	cout << "검색한 학생의 데이터가 존재하지 않습니다.\n\n\n";			// 끝까지 돌아도 없으면 해당 메시지 출력 후 NULL 리턴
 	return NULL;
 }
 
-void ModifyStdInfo(Student* pSt) {
-	/* 특정 학생 정보 수정 */
-	cout << "* <" << pSt->StdName << ", " << pSt->Hakbun << ">의 정보를 수정하세요\n";
-	cout << "이름: ";
-	InputValue(pSt->StdName);
-	cout << "학번: ";
-	InputValue(pSt->Hakbun);
-	cout << "\n\n\n";
+/* 특정 학생 정보 수정 */
+void ModifyStdInfo(Student* pSt, int StdNum) {
+	Student *temp = StdSearch(pSt, StdNum);
+	if (temp != NULL) {												// 학생 이름을 검색한 결과 해당 학생이 존재한다면 정보 수정
+		cout << "* <" << temp->StdName << ", " << temp->Hakbun << ">의 정보를 수정하세요\n";
+		cout << "이름: ";
+		InputValue(temp->StdName);
+		cout << "학번: ";
+		InputValue(temp->Hakbun);
+		cout << "\n\n\n";
+	}
 }
